@@ -9,3 +9,4 @@
 - ConfigMap
 - IngressRoute
 #### The script for deploying/collapsing of the infrastructure was also created ####
+#### Link to video with instructions [link](https://youtu.be/D5WE12VZpsw) ####
