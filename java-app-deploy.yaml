@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: java-app-deploy
+
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      app: web-application
+
+  template:
+    metadata:
+      labels:
+        app: web-application
+        inservice: k3s-java-app-service
+    spec:
+      containers:
+      - image: docker.io/igorbibichkov/demo:1.6.2
+        name: web-application
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "0.3"
+            memory: "512Mi"
+          requests:
+            cpu: "0.3"
+            memory: "256Mi"
+        ports:
+          - name: web
+            containerPort: 8084

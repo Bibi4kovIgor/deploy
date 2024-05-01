@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: k3s-postgres-deploy
+
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: k3s-postgres-deploy
+      
+  template:
+    metadata:
+      labels:
+        app: k3s-postgres-deploy
+        inservice: k3s-postgres-service
+    spec:
+      volumes:
+        - name: k3s-postgres-volume
+          persistentVolumeClaim: 
+            claimName: postgres-deploy-pvc
+      containers:
+      - name: postgres-server
+        image: postgres:15.6-alpine3.19
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config-map
+              key: postgres_user
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: app-config-map
+              key: postgres_db
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-pass
+              key: password
+
+        startupProbe:
+          initialDelaySeconds: 0
+          failureThreshold: 4
+          periodSeconds: 3
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - |
+              - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+        ports:
+          - containerPort: 5432
+            protocol: TCP
+
+
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: k3s-postgres-volume
