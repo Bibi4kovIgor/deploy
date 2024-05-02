@@ -27,29 +27,30 @@ metadata:
   namespace: default    
 spec:
   entryPoints:
-    - web
+  - web
   routes:
-    - kind: Rule
-      match: Host(`my-host.net`) && PathPrefix(`/v1`)
-      services: 
-        - kind: Service
-          name: k3s-java-app-service
-          namespace: default
-          port: 80
-          passHostHeader: true
-          nativeLB: true
-      middlewares:
-        - name: v1
+  - kind: Rule
+    match: Host(`my-host.net`) && PathPrefix(`/v1`)
+    services: 
+    - kind: Service
+      name: k3s-java-app-service
+      namespace: default
+      port: 80
+      nativeLB: true
+    middlewares:
+    - name: v1
+      namespace: default
 
-    - kind: Rule
-      match: Host(`my-host.net`) && PathPrefix(`/v2`)
-      services: 
-        - kind: Service
-          name: k3s-java-app-service
-          namespace: default
-          port: 80
-          passHostHeader: true
-          nativeLB: true
-      middlewares:
-      - name: v2
+  - kind: Rule
+    match: Host(`my-host.net`) && PathPrefix(`/v2`)
+    services: 
+    - kind: Service
+      name: k3s-java-app-service
+      namespace: default
+      port: 80
+      passHostHeader: true
+      nativeLB: true
+    middlewares:
+    - name: v2
+      namespace: default
       
