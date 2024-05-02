@@ -1,4 +1,26 @@
 apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: v1
+spec:
+  stripPrefix:
+    prefixes:
+      - /v1
+
+---   
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: v2
+spec:
+  stripPrefix:
+    prefixes:
+      - /v2
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: java-app-ingress-route
@@ -7,13 +29,27 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`my-host-2.net`)
-    kind: Rule
-    services: 
-    - kind: Service
-      name: k3s-java-app-service
-      namespace: default
-      passHostHeader: true
-      port: 80
-      scheme: http
-      nativeLB: true
+    - kind: Rule
+      match: Host(`my-host.net`) && PathPrefix(`/v1`)
+      services: 
+        - kind: Service
+          name: k3s-java-app-service
+          namespace: default
+          port: 80
+          passHostHeader: true
+          nativeLB: true
+      middlewares:
+        - name: v1
+
+    - kind: Rule
+      match: Host(`my-host.net`) && PathPrefix(`/v2`)
+      services: 
+        - kind: Service
+          name: k3s-java-app-service
+          namespace: default
+          port: 80
+          passHostHeader: true
+          nativeLB: true
+      middlewares:
+      - name: v2
+      

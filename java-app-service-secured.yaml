@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: k3s-java-app-service-secured
+  namespace: default
+
+spec:
+  selector:
+    inservice: k3s-java-app-service
+  type: ClusterIP
+  ports:
+    - name: web-secured
+      protocol: TCP
+      port: 80
+      targetPort: 8084
+
+
